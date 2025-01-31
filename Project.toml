@@ -1,0 +1,13 @@
+name = "MOPED"
+uuid = "e2229dab-8399-425d-90a7-709ae57a4a71"
+authors = ["manuelbb-upb <manuelbb@mail.uni-paderborn.de> and contributors"]
+version = "0.0.1-DEV"
+
+[compat]
+julia = "1.6.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
