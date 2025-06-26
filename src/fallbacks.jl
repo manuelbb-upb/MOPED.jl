@@ -1,5 +1,3 @@
-import UnPack: @unpack
-
 abstract type AbstractImplementedTrait end
 struct IsImplemented <: AbstractImplementedTrait end
 struct NotImplemented <: AbstractImplementedTrait end
@@ -20,46 +18,24 @@ function is_implemented(
     end
 end
 
-all_bridge_types(obj) = ()
+all_bridges(obj) = ()
 
 abstract type AbstractBridge end
-abstract type AbstractPreparation end
-
-compute(::AbstractPreparation)=error("compute not implemented.")
-
-struct UnsuccessfulPrep <: AbstractPreparation end
-@concrete struct FuncPrep <: AbstractPreparation
-    func
-    args
-end
 
 function is_implemented(
-    ::Type{<:AbstractBridge}, @nospecialize(func::func_Type), args_Type::Type{<:Tuple}
+    bridge::AbstractBridge, @nospecialize(func::func_Type), args_Type::Type{<:Tuple}
 ) where func_Type <: Function
     return NotImplemented()
 end
 function required_funcs_with_argtypes(
-    ::Type{<:AbstractBridge}, @nospecialize(func::func_Type), args_Type::Type{<:Tuple}
+    bridge::AbstractBridge, @nospecialize(func::func_Type), args_Type::Type{<:Tuple}
 ) where func_Type <: Function
     return ()
 end
 function bridging_cost(
-    ::Type{<:AbstractBridge}, @nospecialize(func::func_Type), args_Type::Type{<:Tuple}
+    bridge::AbstractBridge, @nospecialize(func::func_Type), args_Type::Type{<:Tuple}
 ) where func_Type <: Function
     return 1.0
-end
-
-function prep(
-    ::Type{<:AbstractBridge}, @nospecialize(func), args...
-)
-    return FuncPrep(func, args)
-end
-
-function compute(
-    prep::FuncPrep{func_Type, args_Type}
-) where {func_Type, args_Type}
-    @unpack func, args = prep
-    return invoke(func, args_Type, args...)
 end
 
 struct Node
@@ -110,11 +86,12 @@ function add_edge!(graph, node, edge)
     return edge
 end
 
-@kwdef struct BridgedWrapper{obj_Type}
-    obj :: obj_Type
+@kwdef struct BridgedWrapper{bridges_Type}
+    bridges :: bridges_Type
     graph :: Graph = Graph()
     node_dict :: Dict{Tuple{Type, Type}, Node} = Dict{Tuple{Type, Type}, Node}()
 end
+BridgedWrapper(obj) = BridgedWrapper(; bridges = all_bridges(obj))
 
 function reset!(bw::BridgedWrapper)
     empty!(bw.graph)
@@ -122,21 +99,64 @@ function reset!(bw::BridgedWrapper)
     return bw
 end
 
-function prep(
+abstract type AbstractPreparation end
+compute!(prep::AbstractPreparation, @nospecialize(args...))=error("compute not implemented for `$(prep)`.")
+
+struct UnsuccessfulPrep <: AbstractPreparation end
+
+struct FuncPrep{func_Type} <: AbstractPreparation
+    func :: func_Type
+end
+
+function FuncPrep(func::func_Type, args_Type::Type) where func_Type<:Function
+    return FuncPrep(func)
+end
+
+function compute!(prep::FuncPrep, @nospecialize(args...))
+    @unpack func = prep
+    _compute_func_prep(func, args)
+end
+
+function _compute_func_prep(@nospecialize(func::func_Type), args::args_Type) where {func_Type, args_Type}
+    return invoke(func, args_Type, args...)
+end
+
+@concrete struct WrappedPrep
+    prep
+end
+
+function compute!(@nospecialize(wprep::WrappedPrep), @nospecialize(args...))
+    return compute!(wprep.prep, args...)
+end
+
+function bridged_compute(
     bw::BridgedWrapper, @nospecialize(func::func_Type), args...
+) where func_Type <: Function
+    p = prep(bw, func, typeof(args))
+    return compute!(p, args...)
+end
+
+function prep(
+    bw::BridgedWrapper, @nospecialize(func::func_Type), @nospecialize(args_Type)
 ) where {func_Type<:Function}
-    args_Type = typeof(args)
     n = node(bw, func, args_Type)
     if iszero(n.index)
-        return FuncPrep(func, args)
+        return FuncPrep(func, args_Type)
     end
+    _bellman_ford!(bw.graph)
     if isinf(bw.graph.dist[n.index])
         return UnsuccessfulPrep()
     end
-    @show bi = bw.graph.best[n.index]
+    bi = bw.graph.best[n.index]
     #error("`func` allegedly supported by bridges, but `prep` not implemented.")
-    BT = all_bridge_types(bw.obj)[bi]
-    BT()
+    b = bw.bridges[bi]
+    return prep(b, bw, func, args_Type)
+end
+
+function prep(
+    bridge::AbstractBridge, bw::BridgedWrapper, @nospecialize(func::func_Type), @nospecialize(args_Type)
+) where func_Type <: Function
+    error("`prep` not implemented for `$(bridge)` and `$(func)`.")
 end
 
 function node(
@@ -148,6 +168,7 @@ function node(
     bw_impls_func::IsImplemented, 
     bw::BridgedWrapper, @nospecialize(func::func_Type), @nospecialize(args_Type)
 ) where func_Type <: Function
+    @info "$(func) is implemented."
     return Node(0)
 end
 
@@ -155,48 +176,50 @@ function node(
     bw_impls_func::NotImplemented, 
     bw::BridgedWrapper, @nospecialize(func::func_Type), @nospecialize(args_Type)
 ) where func_Type <: Function
-    @unpack obj, graph, node_dict = bw
+    @unpack bridges, graph, node_dict = bw
     nd = _get(node_dict, func, args_Type, nothing)
     if !isnothing(nd)
         return nd
     end
     nd = add_node!(graph)
     _insert!(node_dict, func, args_Type, nd)
-    for (i, BT) = enumerate(all_bridge_types(obj))
-        _maybe_add_bridge!(bw, nd, func, args_Type, i, BT)
+    for (i, bridge) = enumerate(bridges)
+        _maybe_add_bridge!(bw, nd, func, args_Type, i, bridge)
     end
     return nd
 end
 
 function _maybe_add_bridge!(
-    bw, nd, @nospecialize(func::func_Type), @nospecialize(args_Type), i, @nospecialize(BT)
+    bw, nd, @nospecialize(func::func_Type), @nospecialize(args_Type), i, bridge
 ) where func_Type
+    @show bridge
+    @show is_implemented(bridge, func, args_Type)
     return _maybe_add_bridge!(
-        is_implemented(BT, func, args_Type), bw, nd, func, args_Type, i, BT)
+        is_implemented(bridge, func, args_Type), bw, nd, func, args_Type, i, bridge)
 end
 function _maybe_add_bridge!(
-    BT_impls_func::NotImplemented, 
-    bw, nd, @nospecialize(func::func_Type), @nospecialize(args_Type), i, @nospecialize(BT)
+    bridge_impls_func::NotImplemented, 
+    bw, nd, @nospecialize(func::func_Type), @nospecialize(args_Type), i, bridge
 ) where func_Type
     return bw
 end
 function _maybe_add_bridge!(
-    BT_impls_func::IsImplemented, 
-    bw, nd, @nospecialize(func::func_Type), @nospecialize(args_Type), i, @nospecialize(BT)
+    bridge_impls_func::IsImplemented, 
+    bw, nd, @nospecialize(func::func_Type), @nospecialize(args_Type), i, bridge
 ) where func_Type
-    e = _edge(bw, func, args_Type, i, BT)
+    e = _edge(bw, func, args_Type, i, bridge)
     add_edge!(bw.graph, nd, e)
     return bw
 end
 
 function _edge(
-    bw, @nospecialize(func::func_Type), @nospecialize(args_Type), i, @nospecialize(BT)
+    bw, @nospecialize(func::func_Type), @nospecialize(args_Type), i, bridge
 ) where func_Type
     new_nodes = Node[
         node(bw, _func, _args_Type) 
-            for (_func, _args_Type) = required_funcs_with_argtypes(BT, func, args_Type)
+            for (_func, _args_Type) = required_funcs_with_argtypes(bridge, func, args_Type)
     ]
-    bc = bridging_cost(BT, func, args_Type)
+    bc = bridging_cost(bridge, func, args_Type)
     edge = Edge(i, new_nodes, bc)
     return edge
 end
@@ -273,45 +296,3 @@ function _dist(graph::Graph, node::Node)
     ni = node.index
     return iszero(ni) ? 0 : graph.dist[ni]
 end
-
-abstract type AbstractProb end
-
-function afunc(::AbstractProb)
-    nothing
-end
-function is_implemented(
-    ::typeof(afunc), ::Type{<:Tuple{<:AbstractProb}})
-    return NotImplemented()
-end
-
-function bfunc(::AbstractProb)
-    nothing
-end
-function is_implemented(
-    ::typeof(bfunc), ::Type{<:Tuple{<:AbstractProb}})
-    return NotImplemented()
-end
-
-struct ExProb <: AbstractProb end
-
-function bfunc(::ExProb)
-    Inf
-end
-function is_implemented(::typeof(bfunc), ::Type{<:Tuple{<:ExProb}})
-    IsImplemented()
-end
-
-struct afunc_bfunc_Bridge <: AbstractBridge end
-
-function is_implemented(
-    ::Type{<:afunc_bfunc_Bridge}, ::typeof(afunc), ::Type{<:Tuple{<:AbstractProb}})
-    return IsImplemented()
-end
-function required_funcs_with_argtypes(
-    ::Type{<:afunc_bfunc_Bridge}, ::typeof(afunc), args_Type::Type{<:Tuple{<:AbstractProb}})
-    return ((bfunc, args_Type),)
-end
-
-struct ExProb2 <: AbstractProb end
-
-all_bridge_types(::AbstractProb) = (afunc_bfunc_Bridge,)
