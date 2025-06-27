@@ -24,7 +24,7 @@ Interfaces might change, and parts of this package could be split out.
 ### Current Status
 
 I have spend way to much time thinking about 1) + 3), so there are no problems here, yet.
-But I think, the bridging mechanism, that has been developed is really really neat!
+But I think, the bridging mechanism is really really neat!
 
 ## Related
 
@@ -49,3 +49,8 @@ But I think, the bridging mechanism, that has been developed is really really ne
   inspired and influenced the caching mechanism. We support automatic differentiation.
 * [`MultiObjectiveAlgorithms.jl`](https://github.com/jump-dev/MultiObjectiveAlgorithms.jl), 
   a collection of `MOI`-backed algorithms.
+
+## TODO
+* Obviously: Fulfill goals stated above.
+* Documentation and examples.
+* Adapt predecessor code in `./src/NonlinearMultiObjectiveStructures`.
