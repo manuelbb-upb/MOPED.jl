@@ -28,19 +28,24 @@ But I think, the bridging mechanism, that has been developed is really really ne
 
 ## Related
 
-* [NonlinearCG package](https://github.com/manuelbb-upb/NonlinearCGCode): A repository with  
+### Ours
+* [NonlinearCG package](https://github.com/manuelbb-upb/NonlinearCGCode): A repository with 
   some nonlinear CG algorithms and MOO test problems.
-* [This repository](https://github.com/manuelbb-upb/MOBenchmarks) has code to wrap the  
-  Fortran test problem library [TESTMO](https://github.com/DerivativeFreeLibrary/TESTMO). 
-  We compared [`Compromise.jl`](https://github.com/manuelbb-upb/Compromise.jl/tree/main) against
+* [This repository](https://github.com/manuelbb-upb/MOBenchmarks) has code to wrap the 
+  Fortran test problem library [TESTMO](https://github.com/DerivativeFreeLibrary/TESTMO).  
+  We compared [`Compromise.jl`](https://github.com/manuelbb-upb/Compromise.jl/tree/main) against 
   [`DFMO`](https://github.com/DerivativeFreeLibrary/DFMO).  
-  There were a lot of awkward code manipulations.  
+  There were a lot of awkward code manipulations. 
   [This wrapper](https://github.com/manuelbb-upb/DFMOWrapper.jl) is much nicer!
-* [`pymoo`](https://github.com/anyoptimization/pymoo) is a Python package with test problems  
+
+### Others
+* [`Metaheuristics.jl`](https://github.com/jmejia8/Metaheuristics.jl) has algorithms, 
+  some problems, and performance indicators!
+* [`pymoo`](https://github.com/anyoptimization/pymoo) is a Python package with test problems 
   and algorithms.
-* [`MathOptInterface.jl`](https://github.com/jump-dev/MathOptInterface.jl) provided most of  
+* [`MathOptInterface.jl`](https://github.com/jump-dev/MathOptInterface.jl) provided most of 
   the important ideas concerning **bridging**.
-* [`DifferentiationInterface.jl`](https://github.com/JuliaDiff/DifferentiationInterface.jl)  
+* [`DifferentiationInterface.jl`](https://github.com/JuliaDiff/DifferentiationInterface.jl) 
   inspired and influenced the caching mechanism. We support automatic differentiation.
-* [`MultiObjectiveAlgorithms.jl`](https://github.com/jump-dev/MultiObjectiveAlgorithms.jl),  
+* [`MultiObjectiveAlgorithms.jl`](https://github.com/jump-dev/MultiObjectiveAlgorithms.jl), 
   a collection of `MOI`-backed algorithms.
