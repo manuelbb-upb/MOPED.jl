@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Hypergraph · MOPED.jl</title><meta name="title" content="Hypergraph · MOPED.jl"/><meta property="og:title" content="Hypergraph · MOPED.jl"/><meta property="twitter:title" content="Hypergraph · MOPED.jl"/><meta name="description" content="Documentation for MOPED.jl."/><meta property="og:description" content="Documentation for MOPED.jl."/><meta property="twitter:description" content="Documentation for MOPED.jl."/><meta property="og:url" content="https://manuelbb-upb.github.io/MOPED.jl/graph/"/><meta property="twitter:url" content="https://manuelbb-upb.github.io/MOPED.jl/graph/"/><link rel="canonical" href="https://manuelbb-upb.github.io/MOPED.jl/graph/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">MOPED.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><span class="tocitem">Internals</span><ul><li><a class="tocitem" href="../problem_interface/">Problem Interface</a></li><li class="is-active"><a class="tocitem" href>Hypergraph</a><ul class="internal"><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#Method-Implementation-Trait"><span>Method Implementation Trait</span></a></li><li><a class="tocitem" href="#The-Hypergraph-of-Bridges"><span>The Hypergraph of Bridges</span></a></li></ul></li><li><a class="tocitem" href="../bridging_interface/">Bridging</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Internals</a></li><li class="is-active"><a href>Hypergraph</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Hypergraph</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/manuelbb-upb/MOPED.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/manuelbb-upb/MOPED.jl/blob/main/docs/src/graph.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Hypergraph-Types"><a class="docs-heading-anchor" href="#Hypergraph-Types">Hypergraph Types</a><a id="Hypergraph-Types-1"></a><a class="docs-heading-anchor-permalink" href="#Hypergraph-Types" title="Permalink"></a></h1><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><p>This file describes a graph structure inspired by <code>MathOptInterface</code>. The structure is used to find the shortest path in the hypergraph of function call bridges in a type-stable manner. To be precise, we want to enable inter-dependent fallbacks for certain function calls with known argument types.</p><h2 id="Method-Implementation-Trait"><a class="docs-heading-anchor" href="#Method-Implementation-Trait">Method Implementation Trait</a><a id="Method-Implementation-Trait-1"></a><a class="docs-heading-anchor-permalink" href="#Method-Implementation-Trait" title="Permalink"></a></h2><p>Whether or not a suitable method exists is indicated with a trait:</p><pre><code class="language-julia hljs">abstract type AbstractImplementedTrait end
+struct IsImplemented &lt;: AbstractImplementedTrait end
+struct NotImplemented &lt;: AbstractImplementedTrait end</code></pre><p>The trait is queried with <code>is_implemented</code>:</p><pre><code class="language-julia hljs">@nospecialize
+is_implemented(func, args_Type)=NotImplemented()
+@specialize</code></pre><p>This trait function can be specialized. It falls back to checking if an applicable method exists (statically, thanks to <code>Tricks.jl</code>)</p><pre><code class="language-julia hljs">@nospecialize
+function is_implemented(
+    func::func_Type,
+    args_Type::Type{&lt;:Tuple}
+) where func_Type &lt;: Function
+    if _applicable(func, args_Type)
+        return IsImplemented()
+    else
+        return NotImplemented()
+    end
+end
+@specialize</code></pre><h2 id="The-Hypergraph-of-Bridges"><a class="docs-heading-anchor" href="#The-Hypergraph-of-Bridges">The Hypergraph of Bridges</a><a id="The-Hypergraph-of-Bridges-1"></a><a class="docs-heading-anchor-permalink" href="#The-Hypergraph-of-Bridges" title="Permalink"></a></h2><p>The requested function calls can be thought of as vertices in a directed hypergraph. More precisely, vertices in an F-graph. Fallback bridges are then hyper-edges, starting in a function call vertex and pointing to other vertices that enable the fallback calculations.</p><blockquote><p><strong>Note</strong></p><p>In certain situations, a bridge can itself perform all the necessary operations based on information inferred from the argument types. Then the hyper-edge points to &quot;virtual&quot; vertices, which are just assumed to be implemented.</p></blockquote><p>The hypergraph idea allows us to compute shortest bridging paths. But to do so quickly, we don&#39;t store the actual func-arg types or bridge types in the graph structure. Instead, we take inspiration from <a href="https://github.com/jump-dev/MathOptInterface.jl/blob/master/src/Bridges/graph.jl">MathOptInterface</a>.</p><p>A simple node type just wrapping an index:</p><pre><code class="language-julia hljs">&quot;Node(index::Int)&quot;
+struct Node
+    &quot;Integer index. Either `0` or an index into arrays within a `Graph` object.&quot;
+    index :: Int
+end</code></pre><p>The hyper-edge type also stores source information, but also indicates the successor nodes and a cost:</p><pre><code class="language-julia hljs">&quot;Edge(bridge_index::Int, added_nodes::Vector{Node}, cost::Float64)&quot;
+struct Edge
+    &quot;Integer index of bridge inducing this edge in some sorted iterable of bridges.&quot;
+    bridge_index :: Int
+    &quot;Successor nodes this hyper-edge is pointing to.&quot;
+    added_nodes :: Vector{Node}
+    &quot;Briding cost for shortest path calculation&quot;
+    cost :: Float64
+end</code></pre><p>The graph has only a few fields needed for shortest path computation. There is no list of <code>nodes</code>, but a dict mapping function calls to respective nodes is stored in a <code>BridgedWrapper</code>. For shortest path algorithm to work, the node information stored in the edges is sufficient.</p><pre><code class="language-julia hljs">@kwdef struct Graph
+    edges :: Vector{Vector{Edge}} = []
+    dist :: Vector{Float64} = []
+    last_correct_ref :: Base.RefValue{Int} = Ref(0)
+    best :: Vector{Int} = []
+end</code></pre><p>Helper to reset a graph:</p><pre><code class="language-julia hljs">function Base.empty!(graph::Graph)
+    @unpack edges, dist, best, last_correct_ref = graph
+    empty!(edges)
+    empty!(dist)
+    empty!(best)
+    last_correct_ref[] = 0
+    return graph
+end</code></pre><p>Helper to add a new node and return it:</p><pre><code class="language-julia hljs">function add_node!(graph)
+    @unpack edges, dist, best = graph
+    push!(edges, Edge[])
+    push!(best, 0)
+    push!(dist, Inf)
+    return Node(length(dist))
+end</code></pre><p>Helper for pushing an <code>edge</code> starting at <code>node</code>:</p><pre><code class="language-julia hljs">function add_edge!(graph, node, edge)
+    push!(graph.edges[node.index], edge)
+    return edge
+end</code></pre><h3 id="Bellman-Ford-–-Shortest-Path"><a class="docs-heading-anchor" href="#Bellman-Ford-–-Shortest-Path">Bellman Ford – Shortest Path</a><a id="Bellman-Ford-–-Shortest-Path-1"></a><a class="docs-heading-anchor-permalink" href="#Bellman-Ford-–-Shortest-Path" title="Permalink"></a></h3><p>The best bridge is available in <code>graph.best</code> after shortest path search:</p><pre><code class="language-julia hljs">function bridge_index(graph::Graph, n::Node)
+    _bellman_ford!(graph)
+    return graph.best[n.index]
+end</code></pre><p>The implementation is adapted from <code>MathOptInterface</code>:</p><pre><code class="language-julia hljs">function _bellman_ford!(graph::Graph)
+    @unpack best, last_correct_ref = graph
+    lc = last_correct_ref[]</code></pre><p>Has a distance changed in the last iteration?</p><pre><code class="language-julia hljs">    changed = true
+    while changed
+        changed = false
+        for i in (lc+1):length(best)
+            dist, best_index = _updated_dist(
+                graph,
+                graph.dist[i],
+                graph.edges[i],
+            )
+            if !iszero(best_index)
+                graph.dist[i] = dist
+                graph.best[i] = best_index
+                changed = true
+            end
+        end
+    end
+    last_correct_ref[] = length(best)
+    return graph
+end</code></pre><p>Helper to update distance estimate for a node with current distance <code>current</code> and leaving hyper-edges <code>edges</code>:</p><pre><code class="language-julia hljs">function _updated_dist(
+    graph::Graph,
+    current::Float64,
+    edges::Vector{Edge},
+)
+    bridge_index = 0
+    for edge in edges
+        dist = _dist(graph, edge)
+        if isinf(dist)
+            continue
+        end
+        dist += edge.cost
+        if dist &lt; current
+            current = dist
+            bridge_index = edge.bridge_index
+        end
+    end
+    return current, bridge_index
+end</code></pre><p>Return cumulative distance for all successor nodes:</p><pre><code class="language-julia hljs">function _dist(graph::Graph, edge::Edge)
+    return _dist(graph, edge.added_nodes)
+end
+
+function _dist(graph::Graph, nodes::Vector{&lt;:Node})
+    dist = 0
+    for node in nodes
+        d = _dist(graph, node)
+        if isinf(d)
+            return d
+        end
+        dist += d
+    end
+    return dist
+end</code></pre><p>Distance for a single node:</p><pre><code class="language-julia hljs">function _dist(graph::Graph, node::Node)
+    ni = node.index
+    # zero-index: implemented function call ⇒ no cost
+    return iszero(ni) ? 0 : graph.dist[ni]
+end
+
+# Helpers to allow insertion into `Dict{Tuple{Type,Type}, Something}`
+# without giving the type of the function `func` as argument, but rather function itself.
+# We use the helper and this kind of dict, because operations on a dict
+# `Dict{Tuple{Function, Type}, Something}` are rather slow.
+# The helper has `@nospecialize` to avoid costly re-compilations for different functions:
+function _insert!(dict, @nospecialize(func::func_Type), @nospecialize(args_Type), val) where func_Type
+    dict[(func_Type, args_Type)] = val
+    return val
+end
+
+# Similar helper to obtain values from dict:
+function _get(dict, @nospecialize(func::func_Type), @nospecialize(args_Type), default) where func_Type
+    return get(dict, (func_Type, args_Type), default)
+end</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../problem_interface/">« Problem Interface</a><a class="docs-footer-nextpage" href="../bridging_interface/">Bridging »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.13.0 on <span class="colophon-date" title="Friday 27 June 2025 16:30">Friday 27 June 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
