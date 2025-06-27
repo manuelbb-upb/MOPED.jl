@@ -1,0 +1,118 @@
+\documentclass[border=5mm]{standalone}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usetikzlibrary{calc} % For coordinate calculations
+\usetikzlibrary{intersections}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18} % Use a recent compatibility version for pgfplots
+
+\definecolor{jblue}{rgb}{0.251, 0.388, 0.847}
+\definecolor{jgreen}{rgb}{0.22, 0.596, 0.149}
+\definecolor{jpurple}{rgb}{0.706, 0.322, 0.804}
+\definecolor{jred}{rgb}{0.804 0.2, 0.2}
+
+\begin{document}
+
+\begin{tikzpicture}
+    %\node at (0,0) {\includegraphics[width=5.1cm]{moped.eps}};
+
+    \coordinate (wcl) at (-1.63,-0.5);
+    \coordinate (wcr) at ($(wcl) + (3.3, 0)$);
+    \coordinate (hb) at ($(wcl) + (.7, 1.75)$);
+    \coordinate (c) at ($(wcl)!.5!(wcr)$);
+    \coordinate (sm) at ($(wcr) + (0, 1)$);
+        
+    \begin{scope}[scale=0.675]
+        \clip (wcl) circle[radius=1cm];
+    \begin{axis}[
+        at={(wcl)},
+        anchor=origin,
+        disabledatascaling,
+        x=1cm,y=1cm,z=0cm,
+        grid=both,
+        view={0}{90},
+        hide axis,
+    ]
+        \addplot3[
+            domain=-1:1,
+            y domain=-1:1,
+            line width=.04cm,
+            colormap/cool,
+            contour lua={
+                number=15,
+                labels=false
+            }
+        ]{x^2 + y^2};
+    \end{axis}
+
+    \end{scope}
+
+    % wheels
+    \draw[jpurple, line width=0.25cm] (wcl) circle[radius=.8cm];
+    \draw[jpurple, line width=0.25cm] (wcr) circle[radius=.8cm];
+
+    % stem and handle bars
+    %\fill[jgreen] (wcl) circle[radius=.125cm];
+    \draw[jgreen, name path=stem, line width=0.25cm, rounded corners,%
+        line cap=round, -Butt Cap, % rounded starting point (axle)
+    ] (wcl) -- (hb) -- ++(.6, 0);
+    
+    \path[name path=helperfront] (c) -- ($(wcl)+(0, 2)$);
+
+    % main frame
+    \draw[jgreen, line width=0.25cm, rounded corners, name intersections={of=stem and helperfront}] 
+        (intersection-1) node[inner sep=0, outer sep=0] (shaft) {} -- (c) -- (wcr);
+
+    % petrol tank
+    %\fill[jgreen, rounded corners] (shaft) .. controls +(.3, -0.05) .. ++(.58, 0) 
+    %    -- ($(c) + (0, .6)$) .. controls +(-0.05, -.3) .. (c) -- (shaft);
+    \coordinate (t1) at ($(shaft)!.2!(c)$);
+    \coordinate (t2) at ($(shaft)!.8!(c)$);
+    \coordinate (t4) at ($(t1)!.4cm!90:(t2)$);
+    \coordinate (t3) at ($(t2)!.4cm!270:(t1)$);
+    \coordinate (t12) at ($(t1)!.5!(t2)$);
+    \coordinate (t23) at ($(t2)!.5!(t3)$);
+    \coordinate (t34) at ($(t3)!.5!(t4)$);
+    \coordinate (t41) at ($(t4)!.5!(t1)$);
+    \coordinate (s12) at ($(t12)!.1cm!90:(t2)$);
+    \coordinate (s23) at ($(t23)!.1cm!270:(t3)$);
+    \coordinate (s34) at ($(t34)!.1cm!90:(t4)$);
+    \coordinate (s41) at ($(t41)!.1cm!270:(t1)$);
+
+    \begin{scope}[transform canvas={xshift=.09cm, yshift=.09cm}]
+        \fill[jblue] plot[smooth cycle]
+            coordinates { (t1) (s12) (t2) (s23) (t3) (s34) (t4) (s41) };
+        \draw[jred, line width=.04cm] plot[smooth]
+            coordinates { (t1) (s12) (t2) };
+        \node[fill=jred, draw=jpurple, line width=0.02cm, star, inner sep=0, minimum size=.15cm] at (t1) {};
+        \node[fill=jred, draw=jpurple, line width=0.02cm, star, inner sep=0, minimum size=.15cm] at (t2) {};
+    \end{scope}
+
+    \coordinate (wtr) at ($(wcr)+(0, .675cm)$);
+    \coordinate (g1) at ($(wcr)!1!30:(wtr)$);
+    \coordinate (g2) at ($(wcr)!1!150:(wtr)$);
+    \coordinate (d1) at ($(wcr)!1cm!300:(wtr)$);
+    \coordinate (d2) at ($(wcr)!1cm!240:(wtr)$);
+    \coordinate (h11) at ($(wcr)!1!300:(wtr)$);
+    \coordinate (h12) at ($(wcr)!1!120:(wtr)$);
+    \coordinate (h21) at ($(wcr)!1!240:(wtr)$);
+    \coordinate (h22) at ($(wcr)!1!420:(wtr)$);
+    \draw[-{Stealth[length=2mm]}, line width=.4mm, jred] (wcr) -- (g1);
+    \draw[-{Stealth[length=2mm]}, line width=.4mm, jred] (wcr) -- (g2);
+    \draw[jred!50!white, line width=.2mm] (h11) -- (h12);
+    \draw[jred!50!white, line width=.2mm] (h21) -- (h22);
+    \fill[jblue] (wcr) -- (d2) decorate[decoration=zigzag] { 
+        arc[start angle=-30, end angle=30, radius=1cm] } -- cycle;
+
+    % exhaust
+    \fill[jgreen, transform canvas={xshift=0.01cm}]
+     ($(c)+(1, 0.125)$) -- ($(wcr)+(0, 0.2)$) -- ($(wcr) + (0, -0.125)$) -- ($(c)+(1,-0.125)$) -- cycle ;
+
+    \fill[jred] (sm) -- ++(.7, 0) -- ++(0, .26) -- 
+        ++(-1.6, 0) .. controls +(-0.2, 0) and +(-0.2, 0.08) .. ++(-0.1, -0.2) -- ++(.5, -.2) 
+        .. controls +(.02, .05) and +(-.3, .0) .. cycle;
+\end{tikzpicture}
+
+\end{document}
