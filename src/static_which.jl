@@ -1,4 +1,7 @@
-import Tricks: _combine_signature_type, create_codeinfo_with_returnvalue
+# This file can be removed if
+# https://github.com/oxinabox/Tricks.jl/issues/13
+# is closed.
+import Tricks: _combine_signature_type, create_codeinfo_with_returnvalue, _method_table_all_edges_all_methods
 """
     static_which(f, [type_tuple::Type{<:Tuple}, throw_error::Union{Val{true}, Val{false}}])
 
@@ -43,9 +46,12 @@ static_which(@nospecialize(f)) = static_which(f, Tuple{Vararg{Any}})
         else
             matched_method = match.method
         end
+    
+        ci = create_codeinfo_with_returnvalue([Symbol("#self#"), :f, :_T, :throw_error], [:T], (:T,), :($matched_method))
         
         # Now we add the edges so if a method is defined this recompiles
-        ci = create_codeinfo_with_returnvalue([Symbol("#self#"), :f, :_T, :throw_error], [:T], (:T,), :($matched_method))
+        ci.edges = _method_table_all_edges_all_methods(f, T, world)
+    
         return ci
     end
     @eval function static_which(@nospecialize(f) , @nospecialize(_T::Type{T}) , @nospecialize(throw_error::Union{Val{true}, Val{false}}=Val(false))) where {T <: Tuple}
@@ -67,6 +73,8 @@ else
             matched_method = match.method
         end
         ci = create_codeinfo_with_returnvalue([Symbol("#self#"), :f, :_T, :throw_error], [:T], (:T,), :($matched_method))
+        # Now we add the edges so if a method is defined this recompiles
+        ci.edges = _method_table_all_edges_all_methods(f, T, world)
         return ci
     end
 end
