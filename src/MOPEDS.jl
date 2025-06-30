@@ -1,4 +1,4 @@
-module MOPED
+module MOPEDS
 
 import LinearAlgebra as LA
 
