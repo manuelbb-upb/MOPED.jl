@@ -5,11 +5,24 @@ abstract type AbstractBridge end
 # For the shortest-path computation(s) in the bridging hyper-graph, the following
 # methods should be implemented.
 @nospecialize
+"""
+    is_implemented(
+        bridge::AbstractBridge, func::Function, args_Type::Type{<:Tuple})
+
+Trait function to indicate if a method exists."""
 function is_implemented(
     bridge::AbstractBridge, func::func_Type, args_Type::Type{<:Tuple}
 ) where func_Type <: Function
     return NotImplemented()
 end
+
+"""
+    required_funcs_with_argtypes(
+        bridge::AbstractBridge, func::Function, args_Type::Type{<:Tuple}
+    )
+
+Return an indexable iterable of function-args_Type tuples required by `bridge`.
+"""
 function required_funcs_with_argtypes(
     bridge::AbstractBridge, func::func_Type, args_Type::Type{<:Tuple}
 ) where func_Type <: Function
@@ -19,6 +32,12 @@ end
 
 # Optionally, define a bridging cost:
 @nospecialize
+"""
+    bridging_cost(
+        bridge::AbstractBridge, func::Function, args_Type::Type{<:Tuple}
+    )
+
+(Positive) cost of bridging with `bridge`."""
 function bridging_cost(
     bridge::AbstractBridge, func::func_Type, args_Type::Type{<:Tuple}
 ) where func_Type <: Function
@@ -47,6 +66,11 @@ all_bridges(obj) = ()
     graph :: Graph = Graph()
     node_dict :: Dict{Tuple{Type, Type}, Node} = Dict{Tuple{Type, Type}, Node}()
 end
+"""
+    BridgedWrapper(obj)
+
+A wrapper around `obj` with bridges `all_bridges(obj)` enabled.
+A `BridgedWrapper` can be used to efficiently query shortest paths."""
 BridgedWrapper(obj) = BridgedWrapper(; bridges = all_bridges(obj))
 
 # More compact printing:

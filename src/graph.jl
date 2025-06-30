@@ -52,7 +52,10 @@ end
 # [MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl/blob/master/src/Bridges/graph.jl).
 
 # A simple node type just wrapping an index:
-"Node(index::Int)"
+"""
+    Node(index::Int)
+    
+Simple node in bridging hypergraph."""
 struct Node
     "Integer index. Either `0` or an index into arrays within a `Graph` object."
     index :: Int
@@ -60,7 +63,10 @@ end
 
 # The hyper-edge type also stores source information, but also indicates the 
 # successor nodes and a cost:
-"Edge(bridge_index::Int, added_nodes::Vector{Node}, cost::Float64)"
+"""
+    Edge(bridge_index::Int, added_nodes::Vector{Node}, cost::Float64)
+
+Hyper-edge in bridging hypergraph."""
 struct Edge
     "Integer index of bridge inducing this edge in some sorted iterable of bridges."
     bridge_index :: Int
