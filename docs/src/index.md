@@ -1,10 +1,10 @@
 ```@meta
-CurrentModule = MOPED
+CurrentModule = MOPEDS
 ```
 
-# MOPED
+# MOPEDS
 
-Documentation for [MOPED](https://github.com/manuelbb-upb/MOPED.jl).
+Documentation for [MOPEDS](https://github.com/manuelbb-upb/MOPEDS.jl).
 
 All docstrings:
 
@@ -12,5 +12,5 @@ All docstrings:
 ```
 
 ```@autodocs
-Modules = [MOPED]
+Modules = [MOPEDS]
 ```

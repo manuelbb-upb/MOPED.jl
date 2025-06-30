@@ -67,6 +67,6 @@ jobs:
         shell: julia --project=docs --color=yes {0}
         run: |
           using Documenter: DocMeta, doctest
-          using MOPED
-          DocMeta.setdocmeta!(MOPED, :DocTestSetup, :(using MOPED); recursive=true)
-          doctest(MOPED)
+          using MOPEDS
+          DocMeta.setdocmeta!(MOPEDS, :DocTestSetup, :(using MOPEDS); recursive=true)
+          doctest(MOPEDS)

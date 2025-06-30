@@ -1,8 +1,8 @@
 # MOPEDS
 ## **M**ulti-**O**bjective **P**roblem and **E**xperimentation **D**ata-**S**tructures
 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://manuelbb-upb.github.io/MOPED.jl/dev/)
-[![Build Status](https://github.com/manuelbb-upb/MOPED.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/manuelbb-upb/MOPED.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://manuelbb-upb.github.io/MOPEDS.jl/dev/)
+[![Build Status](https://github.com/manuelbb-upb/MOPEDS.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/manuelbb-upb/MOPEDS.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 ![Moped Logo](./tex/logo.png)
 

@@ -1,7 +1,7 @@
-using MOPED
+using MOPEDS
 using Test
 
-@testset "MOPED.jl" begin
+@testset "MOPEDS.jl" begin
     # Write your tests here.
 #=
 abstract type AbstractProb end
