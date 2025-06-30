@@ -1,9 +1,9 @@
-using MOPED
+using MOPEDS
 using Documenter
 
 import Literate
 
-DocMeta.setdocmeta!(MOPED, :DocTestSetup, :(using MOPED); recursive=true)
+DocMeta.setdocmeta!(MOPEDS, :DocTestSetup, :(using MOPEDS); recursive=true)
 
 function src_md(fn)
     in_file = joinpath(@__DIR__, "..", "src", fn)
@@ -16,11 +16,11 @@ src_md("graph.jl")
 src_md("bridging_interface.jl")
 
 makedocs(;
-    modules=[MOPED],
+    modules=[MOPEDS],
     authors="manuelbb-upb <manuelbb@mail.uni-paderborn.de> and contributors",
-    sitename="MOPED.jl",
+    sitename="MOPEDS.jl",
     format=Documenter.HTML(;
-        canonical="https://manuelbb-upb.github.io/MOPED.jl",
+        canonical="https://manuelbb-upb.github.io/MOPEDS.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -35,6 +35,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/manuelbb-upb/MOPED.jl",
+    repo="github.com/manuelbb-upb/MOPEDS.jl",
     devbranch="main",
 )
